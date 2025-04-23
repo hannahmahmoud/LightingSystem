@@ -1,8 +1,7 @@
 package com.lightingsystem.lightingsystem.Response;
 
-
-
 import com.lightingsystem.lightingsystem.Validators.signupValidator;
+
 
 import lombok.Data;
 import lombok.Getter;
@@ -15,6 +14,7 @@ public   class   ResponseMessage {
     private String status;
         private signupValidator user;
         String message;
+        private String token;
 
 
     public ResponseMessage(String status,signupValidator user )
@@ -28,4 +28,10 @@ public   class   ResponseMessage {
         this.message=message;
     }
     public ResponseMessage(){}
+    public ResponseMessage(String status, String message, String token )
+    {
+        this.status=status;
+        this.message=message;
+        this.token=token;
+    }
 }

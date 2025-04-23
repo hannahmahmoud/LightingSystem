@@ -9,6 +9,7 @@ import com.lightingsystem.lightingsystem.Model.AuthUser;
 import com.lightingsystem.lightingsystem.Repository.userRepo;
 import com.lightingsystem.lightingsystem.Response.ResponseMessage;
 import com.lightingsystem.lightingsystem.Validators.signupValidator;
+import com.lightingsystem.lightingsystem.config.jwtUtil;
 import com.lightingsystem.lightingsystem.Validators.loginValidator;;
 
 
@@ -25,6 +26,9 @@ private  userRepo userRepository;
 
 @Autowired
     private PasswordEncoder  passwordEncoder; 
+  
+  @Autowired
+  private jwtUtil jwtUtil;
 private AuthUser authUser;
  public ResponseEntity<Object> signup (signupValidator newUser)
  {    
@@ -72,7 +76,9 @@ public ResponseEntity<Object> login(loginValidator user)
   
   }
   // matnsesh t3mli hwar token dah mohem 
-  message = new ResponseMessage("Success", "Login successful");
+  String token =jwtUtil.generateToken(user.getEmail());
+
+  message = new ResponseMessage("Success", "Login successful", token);
 return new  ResponseEntity(message, HttpStatus.OK);
   
 
