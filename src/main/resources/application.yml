@@ -7,9 +7,9 @@ server:
 # Database Configuration
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/lightingsystem
+    url: jdbc:mysql://127.0.0.1:3306/lightingsystem
     username: root
-    password: 01012454325hana
+    password: mysqlpassword
 
   # Security configuration
   security:

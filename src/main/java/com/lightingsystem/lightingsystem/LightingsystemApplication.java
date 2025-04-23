@@ -4,11 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-//@SpringBootApplication
+// @SpringBootApplication
 // to run in the teriminal : mvn spring-boot:run
-// to stop server: crtl c 
+// to stop server: crtl c
 // for clean run : mvn clean install
-
 
 public class LightingsystemApplication {
 
