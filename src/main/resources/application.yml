@@ -1,0 +1,27 @@
+# server config
+server:
+  error:
+    include-message: always # Always include error messages for debugging
+    include-binding-errors: always # Include binding errors for debugging
+
+# Database Configuration
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/lightingsystem
+    username: root
+    password: 01012454325hana
+
+  # Security configuration
+  security:
+    user:
+      name: admin
+      password: admin123
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # This will update the schema (for development)
+    show-sql: true       # Enable SQL logging to see the queries in console
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
