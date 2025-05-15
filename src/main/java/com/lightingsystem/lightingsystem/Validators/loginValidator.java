@@ -10,21 +10,16 @@ import lombok.Setter;
 
 public class loginValidator {
 
-    @NotBlank(message= "Email is a required field!")
+    @NotBlank(message = "Email is a required field!")
     @Email(message = "Invalid form of email!")
-    private String email; 
-    
-    @NotBlank(message= "Please provide a pin!")
+    private String email;
+
+    @NotBlank(message = "Please provide a pin!")
     private String password;
-    
-    public loginValidator(String email,String password)
-{
-    this.email=email;
-    this.password=password;
 
-}    
+    public loginValidator(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
-
-
-    
 }
