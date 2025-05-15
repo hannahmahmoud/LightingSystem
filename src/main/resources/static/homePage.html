@@ -39,8 +39,9 @@
           
         </div>
         <div class="right-col">
-            <form class="right-col-flexbox" action="your-backend-endpoint" method="POST">
-              <div class="flex-items1">
+            <form class="right-col-flexbox" onsubmit="loginUser(event)">
+
+            <div class="flex-items1">
                 <div class="flex-items1-login">Log in</div>
                 <div class="flex-items1-text">Please log in to view your home settings.</div>
               </div>
@@ -54,15 +55,16 @@
                 <label class="flex-items2-label" for="password">Password</label>
                 <input class="flex-items2-input" type="password" id="password" name="password" placeholder="type here">
               </div>
-          
-          
-              <button class="flex-items5" type="button" onclick="location.href='rooms.html'">Log in</button>
+
+
+                <button class="flex-items5" type="submit">Log in</button>
 
 
 
 
-          
-              
+
+
+
             </form>
           </div>
           

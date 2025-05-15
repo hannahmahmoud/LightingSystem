@@ -28,11 +28,10 @@ public class jwtUtil {
     // validate token
     public boolean validateToken(String token) {
         try {
-
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
                     .build()
-                    .parseSignedClaims(token);
+                    .parseClaimsJws(token);
 
             return true;
         } catch (JwtException | IllegalArgumentException e) {
@@ -41,12 +40,11 @@ public class jwtUtil {
     }
 
     public String extractEmail(String token) {
-
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
+                .parseClaimsJws(token)
+                .getBody()
                 .getSubject();
     }
 }

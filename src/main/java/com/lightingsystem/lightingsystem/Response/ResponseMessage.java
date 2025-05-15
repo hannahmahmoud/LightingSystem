@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class ResponseMessage {
     private String status;
+
     private signupValidator user;
     String message;
     private String token;

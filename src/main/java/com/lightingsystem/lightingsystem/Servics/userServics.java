@@ -17,64 +17,64 @@ import com.lightingsystem.lightingsystem.Validators.loginValidator;;
 
 public class userServics {
 
-  private ResponseMessage message;
+    private ResponseMessage message;
 
-  @Autowired
-  private userRepo userRepository;
+    @Autowired
+    private userRepo userRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private jwtUtil jwtUtil;
-  private AuthUser authUser;
+    @Autowired
+    private jwtUtil jwtUtil;
+    private AuthUser authUser;
 
-  public ResponseEntity<Object> signup(signupValidator newUser) {
-    boolean oldUser = userRepository.existsByEmail(newUser.getEmail());
-    if (oldUser == true) {
-      message = new ResponseMessage("Failed", "Email is alr used!");
-      return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    public ResponseEntity<Object> signup(signupValidator newUser) {
+        boolean oldUser = userRepository.existsByEmail(newUser.getEmail());
+        if (oldUser == true) {
+            message = new ResponseMessage("Failed", "Email is alr used!");
+            return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+        }
+
+        authUser = new AuthUser(
+                newUser.getFirstName(),
+                newUser.getLastName(),
+                newUser.getEmail(),
+                this.passwordEncoder.encode(newUser.getPassword()),
+                newUser.getPhoneNumber()
+
+        );
+        userRepository.save(authUser);
+        newUser.setPassword(null);
+
+        ResponseMessage message = new ResponseMessage();
+        message.setStatus("Success");
+        message.setUser(newUser);
+
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
-    authUser = new AuthUser(
-        newUser.getFirstName(),
-        newUser.getLastName(),
-        newUser.getEmail(),
-        this.passwordEncoder.encode(newUser.getPassword()),
-        newUser.getPhoneNumber()
+    public ResponseEntity<Object> login(loginValidator user)
 
-    );
-    userRepository.save(authUser);
-    newUser.setPassword(null);
+    {
+        authUser = userRepository.findByEmail(user.getEmail()).orElse(null);
+        if (authUser == null) {
+            message = new ResponseMessage("Failed!", "Incorrect  Email ");
+            return new ResponseEntity(message, HttpStatus.NOT_FOUND);
+        }
+        String password = user.getPassword();
+        String hashedPassword = authUser.getPassword();
+        if (!passwordEncoder.matches(password, hashedPassword)) {
+            message = new ResponseMessage("Failed!", "Incorrect Password!");
+            return new ResponseEntity(message, HttpStatus.NOT_FOUND);
 
-    ResponseMessage message = new ResponseMessage();
-    message.setStatus("Success");
-    message.setUser(newUser);
+        }
+        // matnsesh t3mli hwar token dah mohem
+        String token = jwtUtil.generateToken(user.getEmail());
 
-    return new ResponseEntity<>(message, HttpStatus.CREATED);
-  }
-
-  public ResponseEntity<Object> login(loginValidator user)
-
-  {
-    authUser = userRepository.findByEmail(user.getEmail()).orElse(null);
-    if (authUser == null) {
-      message = new ResponseMessage("Failed!", "Incorrect  Email ");
-      return new ResponseEntity(message, HttpStatus.NOT_FOUND);
-    }
-    String password = user.getPassword();
-    String hashedPassword = authUser.getPassword();
-    if (!passwordEncoder.matches(password, hashedPassword)) {
-      message = new ResponseMessage("Failed!", "Incorrect Password!");
-      return new ResponseEntity(message, HttpStatus.NOT_FOUND);
+        message = new ResponseMessage("Success", "Login successful", token);
+        return new ResponseEntity(message, HttpStatus.OK);
 
     }
-    // matnsesh t3mli hwar token dah mohem
-    String token = jwtUtil.generateToken(user.getEmail());
-
-    message = new ResponseMessage("Success", "Login successful", token);
-    return new ResponseEntity(message, HttpStatus.OK);
-
-  }
 
 }
