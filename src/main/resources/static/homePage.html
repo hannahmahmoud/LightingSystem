@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/homePage.css" />
+
+
+    <title>Log in</title>
+    <script>
+    async function loginUser(event) {
+      event.preventDefault(); // Prevent form from submitting the default way
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const response = await fetch("/api/v1/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.status === "Success") {
+        window.location.href = "rooms.html";
+      } else {
+        alert(data.message || "Login failed. Please check your credentials.");
+      }
+    }
+  </script>
+</head>
+<body>
+    <div class="main-div">
+        <div class="left-col">
+            <p class="left-col-p1">Welcome Back.</p>
+          
+        </div>
+        <div class="right-col">
+            <form class="right-col-flexbox" action="your-backend-endpoint" method="POST">
+              <div class="flex-items1">
+                <div class="flex-items1-login">Log in</div>
+                <div class="flex-items1-text">Please log in to view your home settings.</div>
+              </div>
+          
+              <div class="flex-items2">
+                <label class="flex-items2-label" for="email">Email</label>
+                <input class="flex-items2-input" type="text" id="email" name="email" placeholder="type here">
+              </div>
+          
+              <div class="flex-items3">
+                <label class="flex-items2-label" for="password">Password</label>
+                <input class="flex-items2-input" type="password" id="password" name="password" placeholder="type here">
+              </div>
+          
+          
+              <button class="flex-items5" type="button" onclick="location.href='rooms.html'">Log in</button>
+
+
+
+
+          
+              
+            </form>
+          </div>
+          
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .main-div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+  }
+  
+  .left-col {
+    background-image: url("../images/right_home_image.jpg");
+    background-size: cover; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
+  
+  .right-col {
+    background-color: #2e2d2a;
+    display: flex;
+    /*flex-direction: column; */
+    justify-content: center;     
+    align-items: center; 
+               
+  }
+  .right-col-flexbox{
+    display: flex;
+    flex-direction: column;
+    height: 60%;
+    justify-content: space-between;
+  }
+  
+  
+  .left-col-p1{
+    color: white;
+    font-size: 5rem;
+  }
+  .flex-items1{
+    color: white;
+  }
+  .flex-items1-login{
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .flex-items1-text{
+    color:#5c5b5a;
+  }
+  .flex-items2{
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+  .flex-items2-label{
+   margin-bottom: 0.5rem;
+  }
+  .flex-items2-input{
+    padding: 0.4rem;
+    border-radius: 5px;
+    border: none;
+  }
+
+  
+  .flex-items2-input:focus {
+    outline: none; 
+    border: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .flex-items3{
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+  .flex-items4 a{
+    color: #5c5b5a;
+  }
+  .flex-items5{
+    padding: 0.5rem;
+    color: white;
+    background-color: #5c5b5a;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: box-shadow 0.2s ease, transform 0.2s ease-in-out;
+    cursor: pointer;
+ }
+ .flex-items5:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); 
+    background-color: #5e5d5c;
+     /* Adds a glowing shadow on hover */
+  }
+  
+  .flex-items5:active {
+    transform: translateY(0.5px); /* Slightly moves the button down when clicked */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow when clicked */
+  }
+  
+
+ .flex-items6{
+    display: flex;
+ }
+ .flex-items6-new{
+    color: white;
+    margin-right: 2rem;
+ }
+ .flex-items6-sign{
+    color: #5c5b5a;
+ }
