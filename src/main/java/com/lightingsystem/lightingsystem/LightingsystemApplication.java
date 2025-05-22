@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // to run in the teriminal : mvn spring-boot:run
 // to stop server: crtl c
 // for clean run : mvn clean install
-
 public class LightingsystemApplication {
 
 	public static void main(String[] args) {
