@@ -13,20 +13,41 @@
     <div class="room-container">
   
       <div class="room-box">
-       <a href="roomControls.html"> <img src="images/Garage.webp" alt="Garage" class="room-image"> </a>
-        <a href="roomControls.html"><p class="room-text">Garage</p></a>
+       <a href="roomControls2.html"> <img src="images/Garage.webp" alt="Garage" class="room-image"> </a>
+        <a href="roomControls2.html"><p class="room-text">Garage</p></a>
       </div>
   
       <div class="room-box">
        <a href="roomControls.html"><img src="images/Reception.jpg" alt="Reception" class="room-image"></a> 
        <a href="roomControls.html"><p class="room-text">Reception</p></a> 
       </div>
-      <div class="room-box">
-        <a href="roomControls.html"><img src="images/Bedroom.jpg" alt="Room" class="room-image"></a>
-        <a href="roomControls.html"><p class="room-text">Room</p></a>
-      </div>
+      
     </div>
+<div id="motion-alert"></div>
 
-    
+
+    <script>
+  const eventSource = new EventSource('/api/led/subscribe');
+
+  eventSource.onopen = () => {
+    console.log('SSE connection opened');
+  };
+
+  eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+  };
+
+  eventSource.addEventListener('motion', (event) => {
+  const alertBox = document.getElementById("motion-alert");
+  alertBox.textContent = event.data;
+  alertBox.style.display = "block";
+
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 5000);
+});
+
+</script>
+
 </body>
 </html>

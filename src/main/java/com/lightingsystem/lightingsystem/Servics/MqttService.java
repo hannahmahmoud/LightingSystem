@@ -3,8 +3,12 @@ package com.lightingsystem.lightingsystem.Servics;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.eclipse.paho.client.mqttv3.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import com.lightingsystem.lightingsystem.Events.MotionDetectedEvent;
 
 @Service
 public class MqttService {
@@ -29,6 +33,9 @@ public class MqttService {
 
     private MqttClient mqttClient;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     @PostConstruct
     public void init() {
         try {
@@ -43,11 +50,26 @@ public class MqttService {
                     System.out.println("MQTT Connection lost: " + cause.getMessage());
                 }
 
-                @Override
-                public void messageArrived(String topic, MqttMessage message) {
-                    System.out.println("Message arrived: [" + topic + "] " + message.toString());
-                    // Handle sensor messages here if needed
-                }
+            
+@Override
+public void messageArrived(String topic, MqttMessage message) {
+    System.out.println("Message arrived: [" + topic + "] " + message.toString());
+
+    if (message.toString().equals("1")) {
+        String location = "";
+        if (topic.equals(topicPir1)) {
+            location = "Reception";
+        } else if (topic.equals(topicPir2)) {
+            location = "Garage";
+        }
+
+        String motionMessage = "Motion detected in " + location + "! Light turned on.";
+        System.out.println(motionMessage);
+        eventPublisher.publishEvent(new MotionDetectedEvent(this, motionMessage));
+    }
+}
+
+
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
@@ -55,8 +77,11 @@ public class MqttService {
                 }
             });
 
+            // Subscribe to PIR sensor topics
             mqttClient.subscribe(topicPir1);
             mqttClient.subscribe(topicPir2);
+
+            System.out.println("MQTT client connected and subscribed to PIR topics.");
 
         } catch (MqttException e) {
             e.printStackTrace();
@@ -90,6 +115,7 @@ public class MqttService {
             if (mqttClient != null) {
                 mqttClient.disconnect();
                 mqttClient.close();
+                System.out.println("MQTT client disconnected and closed.");
             }
         } catch (MqttException e) {
             e.printStackTrace();

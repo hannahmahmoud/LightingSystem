@@ -9,7 +9,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/lightingsystem
     username: root
-    password: mysqlpassword
+    password: 123456
 
   security:
     user:
@@ -26,10 +26,11 @@ spring:
 
 
 mqtt:
-  broker: tcp://broker.hivemq.com:8080
+  broker: tcp://broker.hivemq.com:1883
   clientId: backend-lighting-system
   topic:
     led1: home/led/led1
     led2: home/led/led2
     pir1: home/sensor/pir1
     pir2: home/sensor/pir2
+
