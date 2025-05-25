@@ -1,58 +1,86 @@
-# ESP32 Motion-Activated Lighting System with MQTT
+🚨 ESP32 Motion-Activated Lighting System with MQTT
+This project uses an ESP32 microcontroller to control two LEDs based on input from two PIR motion sensors. It supports automatic (motion-based) and manual override via MQTT messages. A backend server and a frontend dashboard allow users to monitor and control the system.
 
-This project uses an ESP32 microcontroller to control two LEDs based on input from two PIR motion sensors. It also supports manual override of the LEDs using MQTT messages. The system publishes sensor states and responds to control messages via MQTT topics.
+🛠 Hardware Components
+1 x ESP32 Dev Board
 
-## 🛠 Hardware Components
+2 x PIR Motion Sensors
 
-- 1 x ESP32 Dev Board
-- 2 x PIR Motion Sensors
-- 2 x LEDs
-- Resistors (220Ω for LEDs)
-- Jumper Wires
-- Breadboard
+2 x LEDs
 
-## 🔌 Pin Configuration
+2 x Resistors (220Ω for LEDs)
 
-| Component    | ESP32 Pin |
-|--------------|-----------|
-| LED 1        | GPIO 5    |
-| PIR Sensor 1 | GPIO 13   |
-| LED 2        | GPIO 4    |
-| PIR Sensor 2 | GPIO 12   |
+Jumper Wires
 
-## 🌐 WiFi and MQTT
+Breadboard
 
-- **WiFi SSID:** Galaxy A54 5G DA99  
-- **WiFi Password:** yasmin1234  
-- **MQTT Broker:** `broker.hivemq.com`  
-- **Port:** 1883
+🔌 Pin Configuration
+Component	ESP32 Pin
+LED 1	GPIO 5
+PIR Sensor 1	GPIO 13
+LED 2	GPIO 4
+PIR Sensor 2	GPIO 12
 
-## 📡 MQTT Topics
-
-| Topic               | Description                        |
-|---------------------|------------------------------------|
-| `home/led/led1`     | Control LED 1 (`on`, `off`, `auto`)|
-| `home/led/led2`     | Control LED 2 (`on`, `off`, `auto`)|
-| `home/sensor/pir1`  | PIR Sensor 1 output                |
-| `home/sensor/pir2`  | PIR Sensor 2 output                |
-| `home/status`       | Status messages from ESP32         |
-
-## 🧠 Functionality
-
-- Automatically turns LEDs on when motion is detected.
-- Allows manual control of LEDs via MQTT messages.
-- Publishes motion sensor states to MQTT topics.
-
-## 📂 File Structure
+🌐 WiFi and MQTT Configuration
+Setting	Value
+WiFi SSID	"your_SSID"
+WiFi Password	"your_PASSWORD"
+MQTT Broker	broker.hivemq.com
+Port	1883
 
 
-## ✅ How to Use
+📡 MQTT Topics
+Topic	Description
+home/led/led1	Control LED 1 (on, off, auto)
+home/led/led2	Control LED 2 (on, off, auto)
+home/sensor/pir1	PIR Sensor 1 output (1 or 0)
+home/sensor/pir2	PIR Sensor 2 output (1 or 0)
+home/status	System status messages
 
-1. Open `ESP_LightingSystem.ino` in Arduino IDE.
-2. Connect your ESP32 board.
-3. Upload the sketch.
-4. Use an MQTT client (like MQTT Explorer or Node-RED) to monitor topics and send commands.
+🧠 Functionality
+Automatic Mode: LEDs turn on when motion is detected.
 
-## 🔒 Note
+Manual Override: Control LEDs using MQTT commands.
 
-Avoid using personal Wi-Fi credentials and passwords in public repositories. Replace them with placeholders like `"your_SSID"` and `"your_PASSWORD"` before sharing.
+Real-Time Monitoring: Sensor states are published live.
+
+User Interface: Frontend web dashboard subscribes to sensor topics and publishes control messages.
+
+
+🚀 How to Use
+Connect the Hardware
+
+Assemble ESP32, sensors, and LEDs according to the pin configuration above.
+
+Power the ESP32 using USB.
+
+Connect to MQTT Broker
+
+Ensure your ESP32 connects to Wi-Fi.
+
+MQTT messages will be sent to and from broker.hivemq.com.
+
+Run the Backend
+navigate to 
+LightingSystem\src\main\java\com\lightingsystem\lightingsystem\LightingsystemApplication.java
+
+This script can publish/subscribe to MQTT topics, simulate events, or interface with databases.
+
+Launch the Frontend Dashboard
+
+Open http://localhost:8080/homePage.html in a browser.
+
+Use the dashboard to:
+
+Monitor motion sensor status in real-time.
+
+Control LEDs manually (on, off, auto).
+
+Subscribe to MQTT Topics
+
+Use an MQTT client like MQTT Explorer or Node-RED to:
+
+Monitor motion events.
+
+Send commands to control LED behavior.
+
