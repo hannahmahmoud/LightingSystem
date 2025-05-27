@@ -5,15 +5,12 @@
   <link rel="stylesheet" href="css/roomControls.css">
   <title>Controls</title>
   <style>
-    /* Toast container */
     .notification-container {
       position: fixed;
       top: 20px;
       right: 20px;
       z-index: 9999;
     }
-
-    /* Toast notification */
     .notification {
       background-color: #333;
       color: #fff;
@@ -23,12 +20,10 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       animation: fadein 0.5s, fadeout 0.5s 2.5s;
     }
-
     @keyframes fadein {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeout {
       from { opacity: 1; transform: translateY(0); }
       to { opacity: 0; transform: translateY(-10px); }
@@ -36,43 +31,75 @@
   </style>
 </head>
 <body>
-  <img class="background-image" src="images/signUpImage.jpeg" alt="Background Image">
+<img class="background-image" src="images/signUpImage.jpeg" alt="Background Image">
 
-  <div class="button-container">
-    <button class="center-button" onclick="controlLed('on')">Turn On</button>
-    <button class="center-button" onclick="controlLed('off')">Turn Off</button>
-  </div>
+<div class="button-container">
+  <button class="center-button" onclick="controlLight('on')">Turn On</button>
+  <button class="center-button" onclick="controlLight('off')">Turn Off</button>
+</div>
 
-  <!-- Notification area -->
-  <div class="notification-container" id="notificationContainer"></div>
+<div class="notification-container" id="notificationContainer"></div>
 
-  <script>
-    function controlLed(state) {
-      fetch(`http://localhost:8080/api/led/led1?state=${state}`, {
+<script>
+  const location = "garage"; // You can change this or get it dynamically
+  const user = "website";    // You can get this from login/session too
+
+  function controlLight(state) {
+    // Step 1: Control the LED device
+    fetch(`http://localhost:8080/api/led/led1?state=${state}`, {
+      method: 'POST'
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("LED request failed");
+      return response.text();
+    })
+    .then(data => showNotification(`LED ${state}: ${data}`))
+    .catch(error => {
+      console.error('LED Error:', error);
+      showNotification('Failed to send LED command.');
+    });
+
+    // Step 2: Inform the backend sensor system
+    if (state === 'on') {
+      fetch(`http://localhost:8080/api/sensor/light/on?location=${location}&turnedOnBy=${user}`, {
         method: 'POST'
       })
-      .then(response => {
-        if (!response.ok) throw new Error("Request failed");
-        return response.text();
+      .then(response => response.json())
+      .then(data => {
+        console.log('Sensor ON response:', data);
+        showNotification('Sensor recorded: Light turned ON');
       })
-      .then(data => showNotification(data))
       .catch(error => {
-        console.error('Error:', error);
-        showNotification('Failed to send command to backend.');
+        console.error('Sensor ON Error:', error);
+        showNotification('Failed to notify sensor ON');
+      });
+    } else if (state === 'off') {
+      fetch(`http://localhost:8080/api/sensor/motion/off/${user}?location=${location}&by=${user}`, {
+        method: 'POST'
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Sensor OFF response:', data);
+        showNotification('Sensor recorded: Light turned OFF');
+      })
+      .catch(error => {
+        console.error('Sensor OFF Error:', error);
+        showNotification('Failed to notify sensor OFF');
       });
     }
+  }
 
-    function showNotification(message) {
-      const container = document.getElementById('notificationContainer');
-      const notification = document.createElement('div');
-      notification.className = 'notification';
-      notification.textContent = message;
-      container.appendChild(notification);
+  function showNotification(message) {
+    const container = document.getElementById('notificationContainer');
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    container.appendChild(notification);
 
-      setTimeout(() => {
-        container.removeChild(notification);
-      }, 3000);
-    }
-  </script>
+    setTimeout(() => {
+      container.removeChild(notification);
+    }, 3000);
+  }
+</script>
 </body>
 </html>

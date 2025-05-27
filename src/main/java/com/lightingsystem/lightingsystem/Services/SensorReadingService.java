@@ -37,6 +37,27 @@ public class SensorReadingService {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    public ResponseEntity<Object> handleTurnOnDetectionWebsite(String location) {
+        Map<String, Object>response = new HashMap<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        SensorReading newReading = new SensorReading(
+                location,
+                true,
+                now,       // motionDetectedAt
+                now,       // lightTurnedOnAt
+                null,      // lightTurnedOffAt - null because light is ON now
+                "website",       // turnedOffBy - null because light not turned off yet
+                0
+        );
+        sensorReadingRepository.save(newReading);
+        response.put("status","Success");
+        response.put ("Reading",newReading);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+
 
     public ResponseEntity<Object> handleLightTurnedOff(String location, String turnedOffBy) {
         Map<String, Object>response = new HashMap<>();
@@ -72,7 +93,7 @@ public class SensorReadingService {
         null,        // motionDetectedAt - no motion here
         now,         // lightTurnedOnAt
         null,        // lightTurnedOffAt
-        null,        // turnedOffBy - not applicable yet
+        null,        // turnedONBy - not applicable yet
         0
     );
     

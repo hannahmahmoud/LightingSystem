@@ -34,19 +34,19 @@ public class SensorController {
     }
 
     // Light turned OFF
-    @PostMapping("/motion/off")
+    @PostMapping("/motion/off/{by}")
     public ResponseEntity<Object> lightTurnedOff(@RequestParam String location, @RequestParam String by) {
         validateLocation(location);
         return sensorReadingService.handleLightTurnedOff(location.toLowerCase(), by);
     }
 
     // New endpoint: Light turned ON via website (not by sensor motion)
-    @PostMapping("/light/on")
+    @PostMapping("/light/on/")
     public ResponseEntity<Object> lightTurnedOnViaWebsite(@RequestParam String location, @RequestParam(required = false) String turnedOnBy) {
         validateLocation(location);
         // If turnedOnBy is null, default to "website"
         String user = turnedOnBy == null ? "website" : turnedOnBy;
-        return sensorReadingService.handleLightTurnedOn(location.toLowerCase(), user);
+        return sensorReadingService.handleTurnOnDetectionWebsite(location.toLowerCase());
     }
 
     // Listen to MotionDetectedEvent and store it using SensorReadingService
