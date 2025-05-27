@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lightingsystem.lightingsystem.Servics.userServics;
+import com.lightingsystem.lightingsystem.Services.userServics;
 import com.lightingsystem.lightingsystem.Validators.loginValidator;
 import com.lightingsystem.lightingsystem.Validators.signupValidator;
 

@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.lightingsystem.lightingsystem.Events.MotionDetectedEvent;
-import com.lightingsystem.lightingsystem.Servics.MqttService;
+import com.lightingsystem.lightingsystem.Services.MqttService;
 
 @RestController
 @RequestMapping("/api/led")
@@ -26,29 +26,23 @@ public class LedController {
     @Autowired
     private MqttService mqttService;
 
-    // Declare these at the class level
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    // Use ScheduledFuture to track scheduled reset tasks for each LED
     private ScheduledFuture<?> led1AutoResetTask;
     private ScheduledFuture<?> led2AutoResetTask;
 
-    // Delay time before switching back to auto mode, in seconds
     private final long AUTO_MODE_DELAY = 10;
 
     private final CopyOnWriteArrayList<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     @PostMapping("/led1")
     public String controlLed1(@RequestParam String state) {
-        // Publish manual command immediately
         mqttService.publishLed1(state);
 
-        // Cancel previous scheduled auto reset if any
         if (led1AutoResetTask != null && !led1AutoResetTask.isDone()) {
             led1AutoResetTask.cancel(false);
         }
 
-        // If command is on/off, schedule auto mode to resume after delay
         if ("on".equalsIgnoreCase(state) || "off".equalsIgnoreCase(state)) {
             led1AutoResetTask = scheduler.schedule(() -> {
                 mqttService.publishLed1("auto");
@@ -56,10 +50,9 @@ public class LedController {
             }, AUTO_MODE_DELAY, TimeUnit.SECONDS);
         }
 
-        // If command is "auto", no timer needed, just publish
-
         return "LED1 set to: " + state;
     }
+
     @PostMapping("/led2")
     public String controlLed2(@RequestParam String state) {
         mqttService.publishLed2(state);
@@ -79,25 +72,22 @@ public class LedController {
     }
 
     @GetMapping("/subscribe")
-public SseEmitter subscribe() {
-    SseEmitter emitter = new SseEmitter(0L); // No timeout
-    emitters.add(emitter);
+    public SseEmitter subscribe() {
+        SseEmitter emitter = new SseEmitter(0L); // No timeout
+        emitters.add(emitter);
 
-    emitter.onCompletion(() -> emitters.remove(emitter));
-    emitter.onTimeout(() -> emitters.remove(emitter));
-    emitter.onError((e) -> emitters.remove(emitter));
+        emitter.onCompletion(() -> emitters.remove(emitter));
+        emitter.onTimeout(() -> emitters.remove(emitter));
+        emitter.onError((e) -> emitters.remove(emitter));
 
-    // Send a test event immediately
-    try {
-        emitter.send(SseEmitter.event().name("motion").data("Test event: SSE connected!"));
-    } catch (IOException e) {
-        emitters.remove(emitter);
+        try {
+            emitter.send(SseEmitter.event().name("motion").data("Test event: SSE connected!"));
+        } catch (IOException e) {
+            emitters.remove(emitter);
+        }
+
+        return emitter;
     }
-
-    return emitter;
-}
-
-
 
     public void sendMotionNotification(String message) {
         for (SseEmitter emitter : emitters) {
@@ -110,11 +100,20 @@ public SseEmitter subscribe() {
     }
 
     @EventListener
-  
-public void onMotionDetected(MotionDetectedEvent event) {
-    System.out.println("MotionDetectedEvent received in controller: " + event.getMessage());
-    sendMotionNotification(event.getMessage());
-}
+    public void onMotionDetected(MotionDetectedEvent event) {
+        String location = event.getLocation();
+        String turnedOffBy = event.getTurnedOffBy();
 
-    
+        String message;
+        if (turnedOffBy == null) {
+            // Motion detected, light turned ON
+            message = "Motion detected in " + location + "! Light turned on.";
+        } else {
+            // Light turned OFF, specify who turned it off
+            message = "Light turned off in " + location + " by " + turnedOffBy + ".";
+        }
+
+        System.out.println("MotionDetectedEvent received in controller: " + message);
+        sendMotionNotification(message);
+    }
 }

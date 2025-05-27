@@ -1,4 +1,4 @@
-package com.lightingsystem.lightingsystem.Servics;
+package com.lightingsystem.lightingsystem.Services;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -50,26 +50,31 @@ public class MqttService {
                     System.out.println("MQTT Connection lost: " + cause.getMessage());
                 }
 
-            
-@Override
-public void messageArrived(String topic, MqttMessage message) {
-    System.out.println("Message arrived: [" + topic + "] " + message.toString());
+                @Override
+                public void messageArrived(String topic, MqttMessage message) {
+                    String payload = message.toString();
+                    System.out.println("Message arrived: [" + topic + "] " + payload);
 
-    if (message.toString().equals("1")) {
-        String location = "";
-        if (topic.equals(topicPir1)) {
-            location = "Reception";
-        } else if (topic.equals(topicPir2)) {
-            location = "Garage";
-        }
+                    String location = null;
+                    if (topic.equals(topicPir1)) {
+                        location = "Reception";
+                    } else if (topic.equals(topicPir2)) {
+                        location = "Garage";
+                    }
 
-        String motionMessage = "Motion detected in " + location + "! Light turned on.";
-        System.out.println(motionMessage);
-        eventPublisher.publishEvent(new MotionDetectedEvent(this, motionMessage));
-    }
-}
-
-
+                    if (location != null) {
+                        if ("1".equals(payload)) {
+                            // Motion detected, light turned ON
+                            eventPublisher.publishEvent(new MotionDetectedEvent(this, location, null));
+                            System.out.println("Motion detected in " + location + "! Light turned on.");
+                        } else if ("0".equals(payload)) {
+                            // Motion stopped, light turned OFF by sensor
+                            eventPublisher.publishEvent(new MotionDetectedEvent(this, location, "sensor"));
+                            System.out.println("Light turned off in " + location + " by sensor.");
+                        }
+                        // You can add more logic for other payloads or user-triggered events here
+                    }
+                }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
