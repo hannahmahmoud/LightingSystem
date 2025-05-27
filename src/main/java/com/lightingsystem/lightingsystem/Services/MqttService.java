@@ -1,5 +1,4 @@
 package com.lightingsystem.lightingsystem.Services;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.eclipse.paho.client.mqttv3.*;
@@ -9,6 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.lightingsystem.lightingsystem.Events.MotionDetectedEvent;
+
 
 @Service
 public class MqttService {
@@ -31,10 +31,21 @@ public class MqttService {
     @Value("${mqtt.topic.pir2}")
     private String topicPir2;
 
+    @Value("${mqtt.topic.power1}")
+    private String topicPower1;
+
+    @Value("${mqtt.topic.power2}")
+    private String topicPower2;
+
+
     private MqttClient mqttClient;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+private PowerService powerService;
+
 
     @PostConstruct
     public void init() {
@@ -63,17 +74,24 @@ public class MqttService {
                     }
 
                     if (location != null) {
-                        if ("1".equals(payload)) {
+                        if ("0".equals(payload)) {
                             // Motion detected, light turned ON
                             eventPublisher.publishEvent(new MotionDetectedEvent(this, location, null));
                             System.out.println("Motion detected in " + location + "! Light turned on.");
-                        } else if ("0".equals(payload)) {
+                        } else if ("1".equals(payload)) {
                             // Motion stopped, light turned OFF by sensor
                             eventPublisher.publishEvent(new MotionDetectedEvent(this, location, "sensor"));
                             System.out.println("Light turned off in " + location + " by sensor.");
                         }
-                        // You can add more logic for other payloads or user-triggered events here
                     }
+                    if (topic.equals(topicPower1)) {
+                    powerService.handlePowerReading("reception", Double.parseDouble(payload));
+                    System.out.println("Power reading for reception: " + payload + " W");
+                    } else if (topic.equals(topicPower2)) {
+                          powerService.handlePowerReading("garage", Double.parseDouble(payload));
+                         System.out.println("Power reading for garage: " + payload + " W");
+                        }
+
                 }
 
                 @Override

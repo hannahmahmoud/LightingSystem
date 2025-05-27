@@ -36,17 +36,22 @@ public class SensorReading
     private LocalDateTime lightTurnedOffAt;
 
     @Column(length = 50, nullable = true)
-    private String turnedOffBy; // "sensor" or "user"
+    private String turnedOffBy; 
+
+    @Column(nullable = true)
+    private double powerconsumed;
+
 
     public SensorReading() {}
 
-    public SensorReading(String location, boolean motionDetected, LocalDateTime motionDetectedAt, LocalDateTime lightTurnedOnAt, LocalDateTime lightTurnedOffAt, String turnedOffBy ) {
+    public SensorReading(String location, boolean motionDetected, LocalDateTime motionDetectedAt, LocalDateTime lightTurnedOnAt, LocalDateTime lightTurnedOffAt, String turnedOffBy, double powerconsumed ) {
         this.location = location;
         this.motionDetected = motionDetected;
         this.motionDetectedAt = motionDetectedAt;
         this.lightTurnedOnAt = lightTurnedOnAt;
         this.lightTurnedOffAt = lightTurnedOffAt;
         this.turnedOffBy = turnedOffBy;
+        this.powerconsumed = powerconsumed;
     }
 
 }

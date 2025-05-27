@@ -1,10 +1,14 @@
 package com.lightingsystem.lightingsystem.Controller;
 
+import com.lightingsystem.lightingsystem.Events.MotionDetectedEvent;
 import com.lightingsystem.lightingsystem.Services.SensorReadingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.context.event.EventListener;
 
 import java.util.Set;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/sensor")
@@ -22,15 +26,43 @@ public class SensorController {
         }
     }
 
-    @PostMapping("/motion/on")
-    public void motionDetected(@RequestParam String location) {
+    // Motion detected (sensor triggered) - light turned ON
+    @PostMapping("/motion/on/{location}")
+    public ResponseEntity<Object> motionDetected(@PathVariable String location) {
         validateLocation(location);
-        sensorReadingService.handleMotionDetected(location.toLowerCase());
+        return sensorReadingService.handleMotionDetected(location.toLowerCase());
     }
 
+    // Light turned OFF
     @PostMapping("/motion/off")
-    public void lightTurnedOff(@RequestParam String location, @RequestParam String by) {
+    public ResponseEntity<Object> lightTurnedOff(@RequestParam String location, @RequestParam String by) {
         validateLocation(location);
-        sensorReadingService.handleLightTurnedOff(location.toLowerCase(), by);
+        return sensorReadingService.handleLightTurnedOff(location.toLowerCase(), by);
+    }
+
+    // New endpoint: Light turned ON via website (not by sensor motion)
+    @PostMapping("/light/on")
+    public ResponseEntity<Object> lightTurnedOnViaWebsite(@RequestParam String location, @RequestParam(required = false) String turnedOnBy) {
+        validateLocation(location);
+        // If turnedOnBy is null, default to "website"
+        String user = turnedOnBy == null ? "website" : turnedOnBy;
+        return sensorReadingService.handleLightTurnedOn(location.toLowerCase(), user);
+    }
+
+    // Listen to MotionDetectedEvent and store it using SensorReadingService
+    @EventListener
+    public void onMotionDetected(MotionDetectedEvent event) {
+        String location = event.getLocation();
+        String turnedOffBy = event.getTurnedOffBy();
+
+        System.out.println("MotionDetectedEvent received in SensorController for DB: " + location + ", by: " + turnedOffBy);
+
+        if (turnedOffBy == null) {
+            // Store as motion detected event
+            sensorReadingService.handleMotionDetected(location);
+        } else {
+            // Store as light turned off event
+            sensorReadingService.handleLightTurnedOff(location, turnedOffBy);
+        }
     }
 }
