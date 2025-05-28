@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class PowerService {
@@ -14,10 +15,16 @@ public class PowerService {
     private SensorReadingRepository repository;
 
     public void handlePowerReading(String location, double powerWatts) {
-        SensorReading reading = new SensorReading();
-        reading.setLocation(location);
-        reading.setPowerconsumed(powerWatts); // ➕ Add this field to your entity if not already present
+        // Find the latest sensor reading for this location
+        Optional<SensorReading> latestReadingOpt = repository.findTopByLocationAndLightTurnedOffAtIsNullOrderByLightTurnedOnAtDesc(location);
 
-        repository.save(reading);
+        if (latestReadingOpt.isPresent()) {
+            SensorReading latestReading = latestReadingOpt.get();
+            latestReading.setPowerconsumed(powerWatts);
+            repository.save(latestReading);
+            System.out.println("Updated powerConsumed for " + location + ": " + powerWatts + "W");
+        } else {
+            System.out.println("⚠️ No sensor reading found to update for location: " + location);
+        }
     }
 }
