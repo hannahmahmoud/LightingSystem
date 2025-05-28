@@ -95,14 +95,14 @@ public class MqttService {
                     // Handle power readings
                     if (topic.equals(topicPower1)) {
                         double power = Double.parseDouble(payload);
-                        latestPowerReadings.put("reception", power);
+                        latestPowerReadings.put("reception", power); // use lowercase consistently
                         powerService.handlePowerReading("reception", power);
-                        System.out.println("Power reading for reception: " + payload + " W");
+                        System.out.println("Power reading for reception: " + power + " W");
                     } else if (topic.equals(topicPower2)) {
                         double power = Double.parseDouble(payload);
                         latestPowerReadings.put("garage", power);
                         powerService.handlePowerReading("garage", power);
-                        System.out.println("Power reading for garage: " + payload + " W");
+                        System.out.println("Power reading for garage: " + power + " W");
                     }
                 }
 
