@@ -39,14 +39,84 @@
   <img class="background-image" src="images/signUpImage.jpeg" alt="Background Image">
 
   <div class="button-container">
-    <button class="center-button" onclick="controlLed('on')">Turn On</button>
-    <button class="center-button" onclick="controlLed('off')">Turn Off</button>
-  </div>
+  <button class="center-button" onclick="turnOnReceptionLight()">Turn On</button>
+<button class="center-button" onclick="turnOffReceptionLight()">Turn Off</button>
 
-  <!-- Notification area -->
+</div>
+<!-- Notification area -->
   <div class="notification-container" id="notificationContainer"></div>
+<script>
+  function turnOnReceptionLight() {
+  // 1. Call the sensor API to save location event
+  fetch('http://localhost:8080/api/sensor/light/on?location=reception&turnedOnBy=website', {
+    method: 'POST'
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Failed to turn on reception light (sensor API)");
+    return response.text();
+  })
+  .then(data => {
+    showNotification(data);
+    // 2. Then call the LED control API to actually turn the LED on
+    return fetch('http://localhost:8080/api/led/led1?state=on', {
+      method: 'POST'
+    });
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Failed to turn on LED (LED API)");
+    return response.text();
+  })
+  .then(data => {
+    showNotification(data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showNotification('Failed to turn on reception light.');
+  });
+}
 
-  <script>
+4
+function turnOffReceptionLight() {
+  // Call sensor API to save light off event
+  fetch('http://localhost:8080/api/sensor/motion/off?location=reception&by=website', {
+    method: 'POST'
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Failed to turn off reception light (sensor API)");
+    return response.text();
+  })
+  .then(data => {
+    showNotification(data);
+    // Then call LED control API to turn LED off
+    return fetch('http://localhost:8080/api/led/led1?state=off', {
+      method: 'POST'
+    });
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("Failed to turn off LED (LED API)");
+    return response.text();
+  })
+  .then(data => {
+    showNotification(data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showNotification('Failed to turn off reception light.');
+  });
+}
+
+
+  function showNotification(message) {
+      const container = document.getElementById('notificationContainer');
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      container.appendChild(notification);
+
+      setTimeout(() => {
+        container.removeChild(notification);
+      }, 3000);
+    }
     function controlLed(state) {
       fetch(`http://localhost:8080/api/led/led1?state=${state}`, {
         method: 'POST'
@@ -61,18 +131,7 @@
         showNotification('Failed to send command to backend.');
       });
     }
+</script>
 
-    function showNotification(message) {
-      const container = document.getElementById('notificationContainer');
-      const notification = document.createElement('div');
-      notification.className = 'notification';
-      notification.textContent = message;
-      container.appendChild(notification);
-
-      setTimeout(() => {
-        container.removeChild(notification);
-      }, 3000);
-    }
-  </script>
 </body>
 </html>

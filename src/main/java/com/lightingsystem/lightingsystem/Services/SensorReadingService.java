@@ -59,30 +59,36 @@ public class SensorReadingService {
 
 
 
-    public ResponseEntity<Object> handleLightTurnedOff(String location, String turnedOffBy) {
-        Map<String, Object>response = new HashMap<>();
-        Optional<SensorReading> optionalReading = sensorReadingRepository
-                .findTopByLocationAndLightTurnedOffAtIsNullOrderByLightTurnedOnAtDesc(location);
+    public ResponseEntity<Object> handleLightTurnedOff(String location, String turnedOffBy, double powerReadingWatts) {
+    Map<String, Object> response = new HashMap<>();
+    Optional<SensorReading> optionalReading = sensorReadingRepository
+            .findTopByLocationAndLightTurnedOffAtIsNullOrderByLightTurnedOnAtDesc(location);
 
-        if (optionalReading.isPresent()) {
-            SensorReading reading = optionalReading.get();
-            reading.setLightTurnedOffAt(LocalDateTime.now());
-            reading.setTurnedOffBy(turnedOffBy);
-            sensorReadingRepository.save(reading);
-             response.put("status","Success");
-            response.put ("Reading",reading);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
-            
-        } else {
-             System.out.println("No active light record found to turn off for location: " + location);
-            response.put("status","Failed");
-            response.put ("message","No active light record found to turn off for location:");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-           
-        }
+    if (optionalReading.isPresent()) {
+        SensorReading reading = optionalReading.get();
+        LocalDateTime now = LocalDateTime.now();
+        reading.setLightTurnedOffAt(now);
+        reading.setTurnedOffBy(turnedOffBy);
 
+        // Calculate duration in seconds
+        long durationSeconds = java.time.Duration.between(reading.getLightTurnedOnAt(), now).getSeconds();
+        
+        // Power consumed = power rating (Watts) * duration (seconds) / 3600
+        double powerConsumedWh = (powerReadingWatts * durationSeconds) / 3600.0;
+        reading.setPowerconsumed(powerConsumedWh);
+
+        sensorReadingRepository.save(reading);
+        response.put("status", "Success");
+        response.put("Reading", reading);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    } else {
+        response.put("status", "Failed");
+        response.put("message", "No active light record found to turn off for location: " + location);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+}
+
     public ResponseEntity<Object> handleLightTurnedOn(String location, String turnedOnBy) {
     Map<String, Object> response = new HashMap<>();
     LocalDateTime now = LocalDateTime.now();
