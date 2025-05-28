@@ -71,7 +71,12 @@ public ResponseEntity<Object> lightTurnedOff(
             sensorReadingService.handleMotionDetected(location);
         } else {
             // Store as light turned off event
-            sensorReadingService.handleLightTurnedOff(location, turnedOffBy);
+            sensorReadingService.handleLightTurnedOff(
+                    location.toLowerCase(),
+                    turnedOffBy,
+                    event.getPowerReading()
+            );
+
         }
     }
 }
