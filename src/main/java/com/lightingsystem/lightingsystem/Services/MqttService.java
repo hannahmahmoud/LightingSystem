@@ -158,4 +158,8 @@ public class MqttService {
             e.printStackTrace();
         }
     }
+    public double getLatestPowerReading(String location) {
+    return latestPowerReadings.getOrDefault(location.toLowerCase(), 0.0);
+}
+
 }

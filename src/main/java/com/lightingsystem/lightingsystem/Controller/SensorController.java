@@ -1,6 +1,7 @@
 package com.lightingsystem.lightingsystem.Controller;
 
 import com.lightingsystem.lightingsystem.Events.MotionDetectedEvent;
+import com.lightingsystem.lightingsystem.Services.MqttService;
 import com.lightingsystem.lightingsystem.Services.SensorReadingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ public class SensorController {
 
     @Autowired
     private SensorReadingService sensorReadingService;
+
+    @Autowired
+    private MqttService mqttService; // Inject it
 
     private static final Set<String> validLocations = Set.of("garage", "reception");
 
@@ -35,14 +39,20 @@ public class SensorController {
 
     // Light turned OFF
   @PostMapping("/motion/off")
-public ResponseEntity<Object> lightTurnedOff(
-    @RequestParam String location,
-    @RequestParam String by,
-    @RequestParam double powerReading // New parameter from ESP or frontend
-) {
-    validateLocation(location);
-    return sensorReadingService.handleLightTurnedOff(location.toLowerCase(), by, powerReading);
-}
+    public ResponseEntity<Object> lightTurnedOff(
+        @RequestParam String location,
+        @RequestParam String by,
+        @RequestParam(required = false) Double powerReading
+    ) {
+        validateLocation(location);
+
+        double actualPowerReading = (powerReading != null)
+            ? powerReading
+            : mqttService.getLatestPowerReading(location.toLowerCase());
+
+        return sensorReadingService.handleLightTurnedOff(location.toLowerCase(), by, actualPowerReading);
+    }
+
 
  
         
